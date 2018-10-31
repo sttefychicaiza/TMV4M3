@@ -1,0 +1,37 @@
+---
+title: "EDAD DE LOS PROFESIONALES CON TÍTULOS DE TERCER Y CUARTO NIVEL"
+author: "Estefany Chicaiza"
+date: "9 de octubre de 2018"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Importancia del Estudio
+
+Al realizar un estudio en la ENEMDU 2018, se decidió estudiar a los profesionales con títulos de tercer y cuarto nivel. En la cual se estudiara las edades contando con 4714 profesionales con títulos de tercer y cuarto nivel. En el cual la persona mas joven es de 20 años y la mas adulta tiene 98 años.
+La edad promedio de los profesionales con título de tercer y cuarto nivel es aproximadamente de 42 años, existiendo una variación de 13 años aproximadamente con respecto a la media.
+El 25% de la población profesional con títulos de tercer y cuarto nivel tiene 31 años, el 50% de la población profesional con títulos de tercer y cuarto nivel tiene 40 años y el 75% de la población profesional con títulos de tercer y cuarto nivel tiene tienen mas de 53 años.
+Este fenómeno social se da por el acceso a la educación superior es muy limitada debido a los ingresos que posee una persona, por lo tanto ocurre que las personas que tengan un título de tercer y cuarto nivel sean adultas.
+
+
+```{r message=FALSE, warning=FALSE}
+library(openxlsx)
+DEBER<-read.xlsx("C:\\Users\\User\\Documents\\R-CLASES\\EJERCICIOS\\DEBER.xlsx")
+library(tidyverse)
+library(modelr)
+glimpse(DEBER)
+ingr_edad<-tbl_df(DEBER)
+tbl_df(ingr_edad)
+ingr_edad %>%
+  ggplot(., aes(EDAD, INGRESO)) + 
+  geom_point() 
+reglin_1 <- lm(INGRESO ~ EDAD, data = DEBER)
+summary(reglin_1)
+
+
+```
