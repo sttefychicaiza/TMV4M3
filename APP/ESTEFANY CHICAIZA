@@ -1,0 +1,82 @@
+#
+# This is a Shiny web application. You can run the application by clicking
+# the 'Run App' button above.
+#
+# Find out more about building applications with Shiny here:
+#
+#    http://shiny.rstudio.com/
+#
+
+library(shiny)
+library(openxlsx)
+library(DT)
+library(shinythemes)
+library(crosstalk)
+datos<-read.xlsx("C:\\Users\\User\\Documents\\R-CLASES\\EJERCICIOS\\DEBER.xlsx")
+
+
+# Define UI for application that draws a histogram
+ui <- fluidPage(
+  theme = shinytheme("slate"),
+  titlePanel("Tabsets"),
+  fluidRow(column(3,
+                  numericInput("bins","Number of bins:",min = 1,max = 50,value = 30),
+                  selectInput("cat","seleccione la categoria",
+                              choices = unique(datos$ESTCIVIL)),
+                  actionButton("boton","Filtrar"),
+                  conditionalPanel(condition = "input='2'"),
+                  h2("H2"),h3("H3"),br(),hr(),
+                  helpText("Texto ayuda"),
+                  textOutput("txt")),
+                 img(src = "aaa.jpg", height = 450, width = 185)),
+  column(9,
+         navbarPage("web",
+                    tabPanel("Plot",plotOutput("distPlot")),
+                    tabPanel("Table",DTOutput("distPlot2")),
+                    tabPanel("Resumen",DTOutput("distPlot3"))
+                    
+         )
+  )
+  )
+
+# Define server logic required to draw a histogram
+server <- function(input, output) {
+  
+  
+  data_filtrada<-eventReactive(input$boton,{
+    datos%>%filter(datos$ESTCIVIL==input$cat)
+  })
+  
+  data2<-reactive({
+    paste("el numero de registros son",dim(data_filtrada())[1])
+  })
+  
+  output$distPlot <- renderPlot({
+    # generate bins based on input$bins from ui.R
+    x    <- datos[, 2] 
+    bins <- seq(min(x), max(x), length.out = input$bins+ 1)
+    
+    # draw the histogram with the specified number of bins
+    hist(x, breaks = bins, col = 'darkgray', border = 'white')
+  })
+  output$distPlot2<-renderDT((
+    data_filtrada()
+  ))
+  
+  output$distPlot3<-renderDT((
+    data_filtrada()%>%
+      group_by(datos$ESTCIVIL) %>%
+      summarize(N=n(), INGR=sum(as.numeric(INGRESO)))))
+  
+    datatable(
+      tmp,extensions = "Buttons", options = list(
+        dom="gfrtip",
+        buttons=c("copy","csv","excel","pdf","print", I("colvis")
+      )
+    )
+  )
+}
+
+# Run the application 
+shinyApp(ui = ui, server = server)
+
